@@ -1,0 +1,26 @@
+# AI Code Security Audit Agent - Dependencies
+# 核心依赖
+pyyaml>=6.0
+requests>=2.31.0
+rich>=13.0.0
+click>=8.1.0
+
+# 分析工具(可选，可通过CLI安装)
+# semgrep>=1.0.0
+# codeql (需通过GitHub CLI单独安装)
+
+# LLM客户端
+openai>=1.0.0
+
+# Git操作
+gitpython>=3.1.0
+
+# 报告生成
+jinja2>=3.1.0
+
+# 数据验证
+pydantic>=2.0.0
+
+# 工具
+colorama>=0.4.6
+tqdm>=4.65.0
