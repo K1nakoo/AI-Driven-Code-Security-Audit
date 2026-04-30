@@ -1,0 +1,148 @@
+# -*- coding: utf-8 -*-
+"""HTML报告模板 — 深色主题响应式"""
+from datetime import datetime
+from html import escape as html_escape
+
+
+class HTMLReportTemplate:
+    """生成独立HTML安全审计报告"""
+
+    @staticmethod
+    def render(audit_result) -> str:
+        findings = getattr(audit_result, "findings", [])
+        fixes = getattr(audit_result, "fixes", [])
+        sc = getattr(audit_result, "supply_chain_findings", [])
+        target = getattr(audit_result, "target", "")
+        duration = round(getattr(audit_result, "duration", 0), 2)
+
+        # 严重度计数
+        sev_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
+        for f in findings:
+            sev = f.get("severity", "info")
+            sev_counts[sev] = sev_counts.get(sev, 0) + 1
+
+        findings_html = ""
+        for i, f in enumerate(findings, 1):
+            sev = f.get("severity", "info")
+            findings_html += f"""
+            <tr class="finding-row" data-severity="{sev}">
+                <td>{i}</td>
+                <td><span class="badge badge-{sev}">{sev.upper()}</span></td>
+                <td><code>{html_escape(f.get('rule_id', '')[:60])}</code></td>
+                <td><code>{html_escape(f.get('file_path', ''))}:{f.get('line', 1)}</code></td>
+                <td>{html_escape(f.get('message', '')[:120])}</td>
+                <td>{f.get('confidence', 0):.0%}</td>
+            </tr>"""
+
+        return f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Code Security Audit Report - {html_escape(target)}</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }}
+        .container {{ max-width: 1400px; margin: 0 auto; }}
+        h1 {{ color: #58a6ff; margin-bottom: 10px; }}
+        .meta {{ color: #8b949e; font-size: 14px; margin-bottom: 30px; }}
+        .cards {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 30px; }}
+        .card {{ background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; text-align: center; }}
+        .card .num {{ font-size: 32px; font-weight: bold; }}
+        .card .label {{ color: #8b949e; font-size: 13px; margin-top: 4px; }}
+        .critical {{ color: #f85149; }}
+        .high {{ color: #f0883e; }}
+        .medium {{ color: #d29922; }}
+        .low {{ color: #58a6ff; }}
+        .info {{ color: #8b949e; }}
+        .badge {{ padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }}
+        .badge-critical {{ background: #f8514920; color: #f85149; }}
+        .badge-high {{ background: #f0883e20; color: #f0883e; }}
+        .badge-medium {{ background: #d2992220; color: #d29922; }}
+        .badge-low {{ background: #58a6ff20; color: #58a6ff; }}
+        .badge-info {{ background: #8b949e20; color: #8b949e; }}
+        .section {{ margin: 30px 0; }}
+        .section h2 {{ border-bottom: 1px solid #30363d; padding-bottom: 8px; margin-bottom: 16px; }}
+        table {{ width: 100%; border-collapse: collapse; }}
+        th {{ text-align: left; padding: 10px; background: #161b22; border-bottom: 2px solid #30363d; }}
+        td {{ padding: 10px; border-bottom: 1px solid #21262d; }}
+        tr:hover {{ background: #1c2128; }}
+        code {{ background: #161b22; padding: 2px 6px; border-radius: 4px; font-size: 13px; }}
+        .filter-bar {{ margin-bottom: 12px; }}
+        .filter-bar button {{ padding: 4px 12px; margin-right: 6px; border: 1px solid #30363d; background: #21262d; color: #c9d1d9; border-radius: 4px; cursor: pointer; }}
+        .filter-bar button:hover {{ background: #30363d; }}
+        .hidden {{ display: none; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Code Security Audit Report</h1>
+        <div class="meta">
+            Target: <code>{html_escape(target)}</code> |
+            Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} |
+            Duration: {duration}s
+        </div>
+
+        <div class="cards">
+            <div class="card"><div class="num critical">{sev_counts['critical']}</div><div class="label">CRITICAL</div></div>
+            <div class="card"><div class="num high">{sev_counts['high']}</div><div class="label">HIGH</div></div>
+            <div class="card"><div class="num medium">{sev_counts['medium']}</div><div class="label">MEDIUM</div></div>
+            <div class="card"><div class="num low">{sev_counts['low']}</div><div class="label">LOW</div></div>
+            <div class="card"><div class="num info">{sev_counts['info']}</div><div class="label">INFO</div></div>
+            <div class="card"><div class="num">{len(findings)}</div><div class="label">TOTAL</div></div>
+            <div class="card"><div class="num">{len(fixes)}</div><div class="label">FIXES</div></div>
+            <div class="card"><div class="num">{len(sc)}</div><div class="label">SUPPLY CHAIN</div></div>
+        </div>
+
+        <div class="section">
+            <h2>Findings</h2>
+            <div class="filter-bar">
+                <button onclick="filterTable('all')">ALL</button>
+                <button onclick="filterTable('critical')">CRITICAL</button>
+                <button onclick="filterTable('high')">HIGH</button>
+                <button onclick="filterTable('medium')">MEDIUM</button>
+                <button onclick="filterTable('low')">LOW</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Severity</th>
+                        <th>Rule</th>
+                        <th>Location</th>
+                        <th>Message</th>
+                        <th>Confidence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {findings_html if findings_html else '<tr><td colspan="6" style="text-align:center;color:#8b949e">No findings</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Supply Chain ({len(sc)} risks)</h2>
+            <table>
+                <thead><tr><th>Package</th><th>Version</th><th>Severity</th><th>CVE</th><th>Description</th></tr></thead>
+                <tbody>
+                    {''.join(f'<tr><td>{html_escape(d.get("package",""))}</td><td>{html_escape(d.get("version",""))}</td><td class="{d.get("severity","info")}">{d.get("severity","info").upper()}</td><td>{html_escape(d.get("cve_id",""))}</td><td>{html_escape(d.get("description","")[:100])}</td></tr>' for d in sc)}
+                </tbody>
+            </table>
+        </div>
+
+        <p style="color:#8b949e;font-size:12px;margin-top:40px;text-align:center">
+            Generated by AI Code Security Audit Agent v0.1.0
+        </p>
+    </div>
+
+    <script>
+        function filterTable(severity) {{
+            document.querySelectorAll('.finding-row').forEach(row => {{
+                if (severity === 'all') row.classList.remove('hidden');
+                else if (row.dataset.severity === severity) row.classList.remove('hidden');
+                else row.classList.add('hidden');
+            }});
+        }}
+    </script>
+</body>
+</html>"""
