@@ -1,0 +1,119 @@
+# AI Code Security Audit Agent - Phase 7 配置文件
+# ============================================
+
+audit:
+  # 扫描配置
+  scan:
+    timeout: 300  # seconds, 单个文件扫描超时
+    max_file_size: 10485760  # 10MB, 跳过过大文件
+    deep_analysis: true  # 启用LLM深度数据流分析
+
+  # 目标文件类型
+  targets:
+    python: [".py", ".pyw"]
+    javascript: [".js", ".jsx", ".ts", ".tsx", ".mjs"]
+    java: [".java", ".kt", ".groovy"]
+    go: [".go"]
+    php: [".php"]
+
+  # 排除目录
+  exclude_dirs:
+    - ".git"
+    - "node_modules"
+    - "__pycache__"
+    - ".venv"
+    - "venv"
+    - "dist"
+    - "build"
+    - ".tox"
+    - "vendor"
+
+  # 排除文件模式
+  exclude_patterns:
+    - "*.min.js"
+    - "*.min.css"
+    - "*.bundle.js"
+    - "test_*.py"
+    - "*_test.py"
+    - "*.spec.js"
+    - "*.test.js"
+
+# 分析器配置
+analyzers:
+  semgrep:
+    enabled: true
+    timeout: 120
+    rules:
+      - "p/python"
+      - "p/javascript"
+      - "p/security-audit"
+    config_path: null
+
+  codeql:
+    enabled: false  # 默认关闭，需要额外安装
+    timeout: 300
+    query_suite: "security-extended"
+
+  # 自定义分析器
+  custom:
+    regex_rules_path: "./config/regex_rules.yaml"
+    enable_entropy_check: true  # 检测高熵字符串(可能为密钥)
+
+# LLM配置
+llm:
+  provider: "openai"  # openai, deepseek, local
+  model: "gpt-4"  # gpt-4, gpt-3.5-turbo, deepseek-chat, etc
+  api_base: ""
+  api_key: ""  # 留空从环境变量LLM_API_KEY读取
+  temperature: 0.1  # 低温度提高一致性
+  max_tokens: 4096
+  retry:
+    max_retries: 3
+    initial_delay: 1.0  # seconds
+    backoff_factor: 2.0
+    max_delay: 30.0
+
+# 修复配置
+fixing:
+  auto_apply: false  # 是否自动应用修复（危险！）
+  confidence_threshold: 0.8  # 低于此分数的修复不会自动应用
+  create_branches: true  # 为每个修复创建git分支
+  dry_run: true  # 默认dry-run，仅生成补丁不实际修改
+
+# 验证配置
+validation:
+  run_tests: true
+  check_build: true
+  test_framework: "auto"  # auto, pytest, unittest, jest, etc
+  test_timeout: 600
+
+# 报告配置
+reporting:
+  output_dir: "./reports"
+  format: "json"  # json, html, markdown
+  include_source_snippets: true
+  include_fix_diffs: true
+  severity_filter: "low"  # 最低报告等级: info, low, medium, high, critical
+
+# 供应链检查
+supply_chain:
+  enabled: true
+  check_dependency_confusion: true
+  use_advisory_db: true
+  npm_registry: "https://registry.npmjs.org"
+  pypi_registry: "https://pypi.org/pypi"
+  check_known_vulnerabilities: true
+  fail_on_critical: false
+
+# 日志配置
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "./audit.log"
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+  console: true
+
+# 通知配置（可选）
+notifications:
+  enabled: false
+  webhook_url: ""
+  slack_channel: ""
