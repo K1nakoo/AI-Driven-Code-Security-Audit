@@ -1,0 +1,102 @@
+{
+  "metadata": {
+    "report_type": "AI Code Security Audit",
+    "version": "0.1.0",
+    "timestamp": "2026-04-30T21:23:34.325665",
+    "target": ".",
+    "duration_seconds": 0.02
+  },
+  "summary": {
+    "total_findings": 0,
+    "by_severity": {},
+    "false_positives_estimated": 0,
+    "supply_chain_risks": 10,
+    "fixes_generated": 0
+  },
+  "findings": [],
+  "fixes_applied": [],
+  "supply_chain": [
+    {
+      "package": "pyyaml",
+      "version": "unknown",
+      "severity": "medium",
+      "cve_id": "",
+      "description": "依赖 pyyaml 未指定版本(可能安装到最新版存在未知风险)",
+      "fix_version": ""
+    },
+    {
+      "package": "requests",
+      "version": "unknown",
+      "severity": "medium",
+      "cve_id": "",
+      "description": "依赖 requests 未指定版本(可能安装到最新版存在未知风险)",
+      "fix_version": ""
+    },
+    {
+      "package": "rich",
+      "version": "unknown",
+      "severity": "medium",
+      "cve_id": "",
+      "description": "依赖 rich 未指定版本(可能安装到最新版存在未知风险)",
+      "fix_version": ""
+    },
+    {
+      "package": "click",
+      "version": "unknown",
+      "severity": "medium",
+      "cve_id": "",
+      "description": "依赖 click 未指定版本(可能安装到最新版存在未知风险)",
+      "fix_version": ""
+    },
+    {
+      "package": "openai",
+      "version": "unknown",
+      "severity": "medium",
+      "cve_id": "",
+      "description": "依赖 openai 未指定版本(可能安装到最新版存在未知风险)",
+      "fix_version": ""
+    },
+    {
+      "package": "gitpython",
+      "version": "unknown",
+      "severity": "medium",
+      "cve_id": "",
+      "description": "依赖 gitpython 未指定版本(可能安装到最新版存在未知风险)",
+      "fix_version": ""
+    },
+    {
+      "package": "jinja2",
+      "version": "unknown",
+      "severity": "medium",
+      "cve_id": "",
+      "description": "依赖 jinja2 未指定版本(可能安装到最新版存在未知风险)",
+      "fix_version": ""
+    },
+    {
+      "package": "pydantic",
+      "version": "unknown",
+      "severity": "medium",
+      "cve_id": "",
+      "description": "依赖 pydantic 未指定版本(可能安装到最新版存在未知风险)",
+      "fix_version": ""
+    },
+    {
+      "package": "colorama",
+      "version": "unknown",
+      "severity": "medium",
+      "cve_id": "",
+      "description": "依赖 colorama 未指定版本(可能安装到最新版存在未知风险)",
+      "fix_version": ""
+    },
+    {
+      "package": "tqdm",
+      "version": "unknown",
+      "severity": "medium",
+      "cve_id": "",
+      "description": "依赖 tqdm 未指定版本(可能安装到最新版存在未知风险)",
+      "fix_version": ""
+    }
+  ],
+  "pipeline_trace": [],
+  "errors": []
+}
